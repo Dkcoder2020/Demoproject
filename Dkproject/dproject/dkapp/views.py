@@ -8,10 +8,31 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .decorators import unauthenticated_user, allowed_users, admin_only
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group,User
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
 def user(request):
-    return render(request,'user.html')
+    orders=request.user.customer.order_set.all()
+    total_orders =   orders.count()
+    deliverd =   orders.filter(status='Delivereds').count()
+    pending =   orders.filter(status='Pending').count()
+    outfor= orders.filter(status='Out of delivery').count()
+    
+    context={'orders':orders,
+              'total_orders':total_orders,
+              'deliverd':deliverd,
+              'pending':pending ,
+              'outfor':outfor        
+             }
+    return render(request,'user.html',context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def settings(request):
+    context={}
+    return render(request,'settings.html',context)
+
 
 @unauthenticated_user
 def register(request):
@@ -28,9 +49,10 @@ def register(request):
                
               group = Group.objects.get(name='customer')
               user.groups.add(group)
-               
-          
-               
+              Customer.objects.create(
+                  user=user,
+              )
+             
               messages.success(request, 'Account was created for ' + username )
               return redirect('login')
             
@@ -69,7 +91,7 @@ def home(request):
     total_orders =   orders.count()
     deliverd =   orders.filter(status='Delivereds').count()
     pending =   orders.filter(status='Pending').count()
-    outfor= orders.filter(status='Out for delivery').count()
+    outfor= orders.filter(status='Out of delivery').count()
     
  
     context= { 'orders':orders,

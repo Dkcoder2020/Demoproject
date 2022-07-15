@@ -3,4 +3,50 @@
 {% block content %}
 {%  include 'status.html' %}
 
+<div class="row">
+	<div class="col">
+		<div class="card card-body">
+			<form method="get" style="padding:-50px">
+              {{myFilter.form}}
+		    <button class="btn btn-primary" type="submit">Search</button>
+		  </form>
+		</div>
+	</div>
+	
+</div>
+<br>
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+			<table class="table table-sm">
+				<tr>
+					<th>Product</th>
+					<th>Category</th>
+					<th>Date </th>
+					<th>Time</th>
+					<th>Status</th>
+					
+				</tr>
+				{% for i in orders %}
+				<tr>
+					<td>{{i.product}}</td>
+					<td>{{i.product.category}}</td>
+					<td>{{i.date_created.date}}</td>
+					<td>{{i.date_created.time}}</td>
+					<td>{{i.status}}</td>
+					
+				</tr>
+
+
+				{% endfor %}
+
+
+
+			</table>
+		</div>
+	</div>
+</div>
+   
 {% endblock %}
+   

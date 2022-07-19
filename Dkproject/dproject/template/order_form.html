@@ -7,9 +7,13 @@
             <form action="" method="POST">
                 {% csrf_token %}
 				
-			
-					{{form }}
-				
+       
+			        {% for formset in formset %}
+
+					{{formset}}
+                    <hr>
+
+					{% endfor %}
 				
                 <button type="submit">submit</button>
       

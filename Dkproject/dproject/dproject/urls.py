@@ -19,6 +19,10 @@ from django.urls import path,include
 from django.conf.urls.static import static 
 from django.conf import settings
 
+admin.site.site_header  =  "Dkstore admin"  
+admin.site.site_title  =  " Dkstore admin site"
+admin.site.index_title  =  "Dkstore Admin"
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('dkapp.urls')),

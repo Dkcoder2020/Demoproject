@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from dkapp.models import *
-from dkapp.forms import OrderForm,CreateUserForm
+from dkapp.forms import OrderForm,CreateUserForm,CustomerForm
 from django.forms import inlineformset_factory
 from .filters import OrderFilter
 from django.contrib.auth.forms import UserCreationForm
@@ -29,8 +29,28 @@ def user(request):
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['customer'])
+def corder(request):
+    
+    return render(request,'corder.html')
+
+
+
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
 def settings(request):
-    context={}
+    customer =request.user.customer
+    form = CustomerForm(instance=customer)
+    
+    if request.method =='POST':
+        form = CustomerForm(request.POST,request.FILES,instance=customer)
+        if form.is_valid():
+            form.save()
+            
+        
+    
+    context={'form':form}
     return render(request,'settings.html',context)
 
 
@@ -134,10 +154,10 @@ def customer(request,pk):
 @allowed_users(allowed_roles=['admin'])
 
 def createorder(request, pk):
-    #OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'))
+    OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status','quantity'))
     customer = Customer.objects.get(id=pk)
-    #formset = OrderFormSet(queryset=Order.objects.none(),instance=customer)
-    form = OrderForm(initial={'customer':customer})
+    formset = OrderFormSet(queryset=Order.objects.none(),instance=customer)
+    #   form = OrderForm(initial={'customer':customer})
     if request.method == 'POST':
             form = OrderForm(request.POST)
           #  formset = OrderFormSet(request.POST, instance=customer)
@@ -145,7 +165,7 @@ def createorder(request, pk):
                 form.save()
                 return redirect('/')
 
-    context = {'form':form}
+    context = {'formset':formset}
     return render(request, 'order_form.html', context)
 
 @login_required(login_url='login')
